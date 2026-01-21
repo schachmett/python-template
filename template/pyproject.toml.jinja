@@ -1,0 +1,44 @@
+[project]
+name = "{{ project_name }}"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+requires-python = ">= {{ python_version }}"
+license = { file = "LICENSE" }
+{% if author_name %}authors = [{ name = "{{ author_name }}" }]
+{% endif %}
+dependencies = []
+optional-dependencies = { dev = [
+    "pytest",
+    "ruff",
+    "pyright"{% if include_precommit %},
+    "pre-commit"{% endif %}
+] }
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py{{ python_version | replace('.', '') }}"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.pyright]
+include = ["src", "tests"]
+ignore = ["**/__pycache__", ".venv", ".tox"]
+typeCheckingMode = "basic"
+pythonVersion = "{{ python_version }}"
+pythonPlatform = "Linux"
+venvPath = "."
+venv = ".venv"

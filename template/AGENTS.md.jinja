@@ -1,0 +1,17 @@
+# Agent Workflow Notes
+
+_Read this first: these notes are for automation agents working in this repository. They highlight the expectations, required tools, and references to consult before making changes._
+
+## Quickstart Checklist
+- Prefer editor-style patch operations (apply_patch or equivalent) for edits; reach for shell commands only when scripted workflows are unavoidable.
+- Run `.venv/bin/ruff format` followed by `.venv/bin/ruff check`, `.venv/bin/pyright`, and `.venv/bin/pytest` before handing work off.
+- If a required tool/command is missing or blocked, stop and ask the user rather than guessing.
+- Do not introduce new runtime or development dependencies without explicit user approval; confirm intent before touching `pyproject.toml`.
+
+## Tooling & Configuration
+- Use the `.venv/bin/` entry points so results match CI and pre-commit.
+- Repository configuration (formatter, linter, type-checker settings) lives in `pyproject.toml`.
+
+## Process Reminders
+- Keep worktrees clean: do not create commits without user direction, stage only what belongs to the current proposal.
+- Before running `git commit`, ask the user for explicit approval in this session.

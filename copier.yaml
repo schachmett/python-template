@@ -1,0 +1,49 @@
+subdirectory: template
+_commit: "HEAD"
+
+exclude:
+  - example
+  - example/**
+  - "{% if not include_precommit %}.pre-commit-config.yaml.jinja{% endif %}"
+  - "{% if not include_github_actions %}.github{% endif %}"
+
+questions:
+  project_name:
+    type: str
+    default: "my-project"
+  package_name:
+    type: str
+    default: "{{ project_name | lower | replace('-', '_') }}"
+  author_name:
+    type: str
+    default: ""
+  license:
+    type: str
+    choices:
+      - MIT
+      - Apache-2.0
+      - Proprietary
+  python_version:
+    type: str
+    choices:
+      - "3.12"
+      - "3.13"
+  include_precommit:
+    type: bool
+    default: true
+  include_github_actions:
+    type: bool
+    default: true
+
+tasks:
+  - command: |
+      echo "Next steps:"
+      echo "  1) python -m venv .venv"
+      echo "  2) . .venv/bin/activate"
+      echo "  3) python -m pip install -U pip"
+      echo "  4) python -m pip install -e \".[dev]\""
+      echo "  5) ruff format"
+      echo "  6) ruff check"
+      echo "  7) pyright"
+      echo "  8) pytest"
+    when: "{{ _copier_phase == 'post' }}"
