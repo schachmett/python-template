@@ -5,17 +5,11 @@ Short project description.
 ## Development
 
 ```bash
-python -m venv .venv
-. .venv/bin/activate
-python -m pip install -U pip
-python -m pip install -e ".[dev]"
+uv sync
 ```
 
 ```bash
-ruff format
-ruff check
-pyright
-pytest
+uv run poe check
 ```
 
 {% if include_precommit %}## Pre-commit
@@ -23,5 +17,12 @@ pytest
 ```bash
 pre-commit install
 pre-commit run --all-files
+```
+{% endif %}
+
+{% if cli %}## CLI
+
+```bash
+uv run {{ project_name }} --help
 ```
 {% endif %}

@@ -1,43 +1,121 @@
 [project]
 name = "{{ project_name }}"
-version = "0.1.0"
+dynamic = ["version"]
 description = ""
 readme = "README.md"
 requires-python = ">= {{ python_version }}"
 license = { file = "LICENSE" }
 {% if author_name %}authors = [{ name = "{{ author_name }}" }]
 {% endif %}
+{% if cli %}
+dependencies = ["typer"]
+
+[project.scripts]
+{{ project_name }} = "{{ package_name }}.cli:main"
+{% else %}
 dependencies = []
-optional-dependencies = { dev = [
-    "pytest",
-    "ruff",
-    "pyright"{% if include_precommit %},
-    "pre-commit"{% endif %}
-] }
+{% endif %}
+
+[dependency-groups]
+dev = [
+  "coverage[toml]",
+  "poethepoet>=0.40.0",
+  "pytest>=9.0.0",
+  "pytest-cov",
+  "ruff>=0.14.13",
+  "pyright"{% if include_precommit %},
+  "pre-commit"{% endif %}
+]
 
 [build-system]
-requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.hatch]
+version.source = "vcs"
 
-[tool.pytest.ini_options]
-addopts = "-q"
+[tool.hatch.build.targets.wheel]
+packages = ["src/{{ package_name }}"]
+include = ["src/{{ package_name }}/py.typed"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/{{ package_name }}/py.typed"]
+
+[tool.poe.tasks]
+format = "ruff format"
+format_check = "ruff format --check"
+lint_fix = "ruff check --fix"
+lint = "ruff check"
+typecheck = "pyright"
+test = "pytest"
+test_cov = "pytest --cov --cov-report=term --cov-report=html"
+fix = ["format", "lint_fix"]
+check = ["format_check", "lint", "typecheck", "test_cov"]
+
+[tool.pytest]
+strict = true
+addopts = ["--color=yes", "--exitfirst", "--failed-first"]
 testpaths = ["tests"]
 pythonpath = ["src"]
 
+[tool.coverage]
+run.source = ["src"]
+run.branch = true
+run.parallel = true
+report.exclude_lines = [
+  "pragma: no cover",
+  "if TYPE_CHECKING:"
+]
+report.skip_covered = true
+report.precision = 1
+html.directory = "htmlcov"
+
 [tool.ruff]
 line-length = 100
-target-version = "py{{ python_version | replace('.', '') }}"
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "B", "UP"]
+src = ["src", "tests"]
+lint.select = ["ALL"]
+lint.extend-safe-fixes = ["TC001", "TC002", "TC003", "TC004"]
+lint.future-annotations = true
+lint.ignore = [
+  "CPY",    # missing copyright notice
+  "G004",   # f-strings in log messages
+  "FIX",    # presence of todo
+  "TD",     # formatting of todo
+  "EM",     # error message formatting
+  "DOC",    # pydoclint
+  "D",      # pydocstyle
+  "TRY003", # long exception message
+  # see https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules:
+  "W191",
+  "E111",
+  "E114",
+  "E117",
+  "D206",
+  "D300",
+  "Q000",
+  "Q001",
+  "Q002",
+  "Q003",
+  "COM812",
+  "COM819",
+]
+lint.per-file-ignores = { "tests/*" = [
+  "INP001",  # missing __init__.py
+  "ARG002",  # unused method argument
+  "S101",    # asserts in tests
+  "ANN001",  # missing arg type in tests
+  "ANN201",  # missing return type in tests
+  "ANN202",  # missing return type for private funcs in tests
+  "SLF001",  # private access
+  "PLR2004", # magic values
+] }
+lint.pylint.max-args = 7
 
 [tool.pyright]
 include = ["src", "tests"]
-ignore = ["**/__pycache__", ".venv", ".tox"]
-typeCheckingMode = "basic"
+ignore = ["**/__pycache__", ".venv"]
+reportPrivateUsage = "none"   # done by ruff
+typeCheckingMode = "strict"
 pythonVersion = "{{ python_version }}"
 pythonPlatform = "Linux"
 venvPath = "."

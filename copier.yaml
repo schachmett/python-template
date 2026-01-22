@@ -5,7 +5,8 @@ exclude:
   - example
   - example/**
   - "{% if not include_precommit %}.pre-commit-config.yaml.jinja{% endif %}"
-  - "{% if not include_github_actions %}.github{% endif %}"
+  - "{% if not cli %}src/{{ package_name }}/cli.py{% endif %}"
+  - "{% if not cli %}tests/test_cli.py{% endif %}"
 
 questions:
   project_name:
@@ -23,27 +24,24 @@ questions:
       - MIT
       - Apache-2.0
       - Proprietary
+    default: MIT
   python_version:
     type: str
+    default: "3.14"
     choices:
+      - "3.14"
       - "3.12"
       - "3.13"
   include_precommit:
     type: bool
     default: true
-  include_github_actions:
+  cli:
     type: bool
-    default: true
+    default: false
 
 tasks:
   - command: |
       echo "Next steps:"
-      echo "  1) python -m venv .venv"
-      echo "  2) . .venv/bin/activate"
-      echo "  3) python -m pip install -U pip"
-      echo "  4) python -m pip install -e \".[dev]\""
-      echo "  5) ruff format"
-      echo "  6) ruff check"
-      echo "  7) pyright"
-      echo "  8) pytest"
+      echo "  1) uv sync"
+      echo "  2) uv run poe check"
     when: "{{ _copier_phase == 'post' }}"
