@@ -5,9 +5,12 @@ This repository is a Copier template for bootstrapping new Python projects.
 ## Usage
 
 ```bash
-python -m pip install --user copier
-copier copy . /tmp/newproj
-cd /tmp/newproj
+sudo apt install pipx
+pipx ensurepath
+pipx install copier
+pipx install uv  # recommended
+copier copy github.com/schachmett/python-template /path/to/newproj
+cd /path/to/newproj
 ```
 
 Follow the printed next steps to create a virtual environment, install dev deps, and run checks.
