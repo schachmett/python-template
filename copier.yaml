@@ -1,45 +1,42 @@
-subdirectory: template
-_commit: "HEAD"
+_subdirectory: template
 
-exclude:
-  - example
-  - example/**
-  - "{% if not include_precommit %}.pre-commit-config.yaml.jinja{% endif %}"
-  - "{% if not cli %}src/{{ package_name }}/cli.py{% endif %}"
-  - "{% if not cli %}tests/test_cli.py{% endif %}"
+project_name:
+  type: str
+  default: "my-project"
 
-questions:
-  project_name:
-    type: str
-    default: "my-project"
-  package_name:
-    type: str
-    default: "{{ project_name | lower | replace('-', '_') }}"
-  author_name:
-    type: str
-    default: ""
-  license:
-    type: str
-    choices:
-      - MIT
-      - Apache-2.0
-      - Proprietary
-    default: MIT
-  python_version:
-    type: str
-    default: "3.14"
-    choices:
-      - "3.14"
-      - "3.12"
-      - "3.13"
-  include_precommit:
-    type: bool
-    default: true
-  cli:
-    type: bool
-    default: false
+package_name:
+  type: str
+  default: "{{ project_name | lower | replace('-', '_') }}"
 
-tasks:
+author_name:
+  type: str
+  default: ""
+
+license:
+  type: str
+  choices:
+    - MIT
+    - Apache-2.0
+    - Proprietary
+  default: MIT
+
+python_version:
+  type: str
+  default: "3.14"
+  choices:
+    - "3.14"
+    - "3.12"
+    - "3.13"
+
+include_precommit:
+  type: bool
+  default: true
+
+cli:
+  type: bool
+  default: false
+
+_tasks:
   - command: |
       echo "Next steps:"
       echo "  1) uv sync"
